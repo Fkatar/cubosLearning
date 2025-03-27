@@ -9,7 +9,8 @@
             {"keys": ["Right"]}
         ],
         "restart": [
-            {"keys": ["R"]}
+            {"keys": ["R"]},
+            {"keys": ["Space"]}
         ],
         "debug-camera-toggle": [
             {"keys": ["LControl"]}

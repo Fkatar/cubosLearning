@@ -1,4 +1,4 @@
-#include "obstacle.hpp"
+#include "jetpack.hpp"
 
 #include <cubos/core/ecs/reflection.hpp>
 #include <cubos/core/reflection/external/glm.hpp>
@@ -10,17 +10,17 @@
 
 using namespace cubos::engine;
 
-CUBOS_REFLECT_IMPL(Obstacle)
+CUBOS_REFLECT_IMPL(Jetpack)
 {
-    return cubos::core::ecs::TypeBuilder<Obstacle>("Obstacle")
+    return cubos::core::TypeBuilder<Jetpack>("Jetpack")
         .withField("velocity", &Obstacle::velocity)
         .withField("killZ", &Obstacle::killZ)
         .build();
 
-    
 }
 
-void obstaclePlugin(Cubos& cubos)
+
+void jetpackPlugin(cubos::engine::Cubos& cubos)
 {
     cubos.depends(assetsPlugin);
     cubos.depends(transformPlugin);
@@ -41,7 +41,3 @@ void obstaclePlugin(Cubos& cubos)
             }
         });
 }
-
-float Obstacle::speedIncrease = 1.0f;  // Initial value of speedIncrease
-
-

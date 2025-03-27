@@ -2,7 +2,7 @@
     "entities": {
         "base": {
             "cubos::engine::RenderVoxelGrid": {
-                "asset": "fe862296-fab7-4bf9-b62e-3cc28448dff1",
+                "asset": "732498a6-7675-4efa-86ef-8f35d3bec485",
                 "offset": {
                     "x": -4,
                     "y": 0,
@@ -23,7 +23,7 @@
             "cubos::engine::Collider": {},
             "cubos::engine::CollisionLayers": 1,
             "cubos::engine::CollisionMask": 1,
-            "Obstacle": {
+            "Jetpack": {
                 "velocity": {
                     "x": 0,
                     "y": 0,

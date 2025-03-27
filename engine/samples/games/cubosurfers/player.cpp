@@ -13,6 +13,10 @@ CUBOS_REFLECT_IMPL(Player)
     return cubos::core::ecs::TypeBuilder<Player>("Player")
         .withField("speed", &Player::speed)
         .withField("laneWidth", &Player::laneWidth)
+        .withField("lane", &Player::lane)  // ✅ Add these if missing
+        .withField("targetLane", &Player::targetLane)
+        .withField("health", &Player::health)  // ✅ Ensure `health` is registered
+        
         .build();
 }
 
@@ -21,6 +25,8 @@ void playerPlugin(Cubos& cubos)
     cubos.depends(inputPlugin);
     cubos.depends(transformPlugin);
 
+
+    //cubos.component<Player>(); previous one
     cubos.component<Player>();
 
     cubos.system("move player").call([](Input& input, const DeltaTime& dt, Query<Player&, Position&> players) {

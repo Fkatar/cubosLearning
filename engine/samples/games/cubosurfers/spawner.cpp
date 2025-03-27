@@ -7,6 +7,9 @@
 #include <cubos/engine/assets/plugin.hpp>
 #include <cubos/engine/transform/plugin.hpp>
 
+#include "obstacle.hpp"
+
+
 using namespace cubos::engine;
 
 CUBOS_REFLECT_IMPL(Spawner)
@@ -35,13 +38,14 @@ void spawnerPlugin(Cubos& cubos)
                 if (spawner.accumulator >= spawner.period)
                 {
                     spawner.accumulator -= spawner.period;
-
+                    Obstacle::increaseSpeed();
                     Position spawnPosition = position;
                     int offset = (rand() % 3) - 1;
                     spawnPosition.vec.x += static_cast<float>(offset) * spawner.laneWidth;
 
                     commands.spawn(assets.read(spawner.scene)->blueprint).add(spawner.sceneRoot, spawnPosition);
                 }
+                
             }
         });
 }

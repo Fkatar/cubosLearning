@@ -11,6 +11,7 @@
 #include <cubos/engine/voxels/plugin.hpp>
 
 #include "obstacle.hpp"
+#include "jetpack.hpp"
 #include "player.hpp"
 #include "spawner.hpp"
 
@@ -29,6 +30,7 @@ int main(int argc, char** argv)
     cubos.plugin(toolsPlugin);
     cubos.plugin(spawnerPlugin);
     cubos.plugin(obstaclePlugin);
+    cubos.plugin(jetpackPlugin);
     cubos.plugin(playerPlugin);
 
     cubos.startupSystem("configure settings").before(settingsTag).call([](Settings& settings) {
@@ -49,7 +51,22 @@ int main(int argc, char** argv)
         });
 
     cubos.system("restart the game on input")
-        .call([](Commands cmds, const Assets& assets, const Input& input, Query<Entity> all) {
+        .call([](Commands cmds, const Assets& assets, const Input& input, Query<Entity> all, Query<Player&> entity) {
+            
+            for (auto [player] : entity) {
+                if (player.health < 0) {
+                    CUBOS_INFO("Player health is below 0, restarting", player.health);
+                    for (auto [ent] : all)
+                    {
+                        cmds.destroy(ent);
+                    }
+                    Obstacle::resetSpeed();
+
+                    cmds.spawn(assets.read(SceneAsset)->blueprint);
+                }
+            }
+            
+           (void)entity;
             if (input.justPressed("restart"))
             {
                 for (auto [ent] : all)
@@ -58,17 +75,28 @@ int main(int argc, char** argv)
                 }
 
                 cmds.spawn(assets.read(SceneAsset)->blueprint);
+
+                Obstacle::resetSpeed();
             }
         });
 
     cubos.system("detect player vs obstacle collisions")
-        .call([](Query<const Player&, const CollidingWith&, const Obstacle&> collisions) {
-            for (auto [player, collidingWith, obstacle] : collisions)
+        .call([](Query<Player&, const CollidingWith&, const Obstacle&> collisions) {
+            for (auto [p, collidingWith, obstacle] : collisions)
             {
                 CUBOS_INFO("Player collided with an obstacle!");
-                (void)player; // here to shut up 'unused variable warning', you can remove it
+                // i want t odestroy the obstacle and decrease the player health, this is detroying thea player instead
+                //redo this
+                p.health--;
+                CUBOS_INFO("Player health = {}", p.health);
+                (void)p; // here to shut up 'unused variable warning', you can remove it
             }
+            
+
         });
 
     cubos.run();
+
+   
+
 }
