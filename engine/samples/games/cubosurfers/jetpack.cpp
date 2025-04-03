@@ -12,29 +12,29 @@ using namespace cubos::engine;
 
 CUBOS_REFLECT_IMPL(Jetpack)
 {
-    return cubos::core::TypeBuilder<Jetpack>("Jetpack")
-        .withField("velocity", &Obstacle::velocity)
-        .withField("killZ", &Obstacle::killZ)
+    return cubos::core::ecs::TypeBuilder<Jetpack>("Jetpack")
+        .withField("velocity", &Jetpack::velocity)
+        .withField("killZ", &Jetpack::killZ)
         .build();
 
 }
 
 
-void jetpackPlugin(cubos::engine::Cubos& cubos)
+void jetpackPlugin(Cubos& cubos)
 {
     cubos.depends(assetsPlugin);
     cubos.depends(transformPlugin);
 
-    cubos.component<Obstacle>();
+    cubos.component<Jetpack>();
 
-    cubos.system("move obstacles")
-        .call([](Commands cmds, const DeltaTime& dt, Query<Entity, const Obstacle&, Position&> obstacles) {
-            for (auto [ent, obstacle, position] : obstacles)
+    cubos.system("move obstacles2")
+        .call([](Commands cmds, const DeltaTime& dt, Query<Entity, const Jetpack&, Position&> obstacles) {
+            for (auto [ent, jetpack, position] : obstacles)
             {
-                position.vec += obstacle.velocity * dt.value() * obstacle.speedIncrease;
+                position.vec += jetpack.velocity * dt.value();
                 position.vec.y = glm::abs(glm::sin(position.vec.z * 0.15F)) * 1.5F;
 
-                if (position.vec.z < obstacle.killZ)
+                if (position.vec.z < jetpack.killZ)
                 {
                     cmds.destroy(ent);
                 }

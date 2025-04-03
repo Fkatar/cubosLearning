@@ -70,7 +70,8 @@
                 "z": 300
             },
             "Spawner": {
-                "scene": "b15272c5-08c9-47f5-9b24-1192332580a8",
+                "ObstacleScene": "6f8d2483-5afd-4913-9bb4-575649a36539",
+                "JetpackScene" : "e1a1e057-cbd1-4937-936d-bc296e133dab",
                 "sceneRoot": "base",
                 "period": 1.0,
                 "laneWidth": 9

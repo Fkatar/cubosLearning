@@ -13,4 +13,4 @@ struct Jetpack
     /* data */
 };
 
-void jetpackPlugin(cubos::engine::Cubos& cubos);
+void jetpackPlugin(cubos::engine::Cubos& cubos); // Ensure that cubos::engine::Cubos is defined in the included headers

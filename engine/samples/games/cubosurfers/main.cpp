@@ -10,10 +10,15 @@
 #include <cubos/engine/utils/free_camera/plugin.hpp>
 #include <cubos/engine/voxels/plugin.hpp>
 
+#include <cubos/engine/transform/plugin.hpp>
+
 #include "obstacle.hpp"
 #include "jetpack.hpp"
 #include "player.hpp"
 #include "spawner.hpp"
+#include "gameTime.hpp"
+
+#include <unistd.h>
 
 using namespace cubos::engine;
 
@@ -28,10 +33,11 @@ int main(int argc, char** argv)
     cubos.plugin(defaultsPlugin);
     cubos.plugin(freeCameraPlugin);
     cubos.plugin(toolsPlugin);
-    cubos.plugin(spawnerPlugin);
     cubos.plugin(obstaclePlugin);
     cubos.plugin(jetpackPlugin);
+    cubos.plugin(spawnerPlugin);
     cubos.plugin(playerPlugin);
+    cubos.plugin(timePlugin);
 
     cubos.startupSystem("configure settings").before(settingsTag).call([](Settings& settings) {
         settings.setString("assets.app.osPath", APP_ASSETS_PATH);
@@ -60,8 +66,6 @@ int main(int argc, char** argv)
                     {
                         cmds.destroy(ent);
                     }
-                    Obstacle::resetSpeed();
-
                     cmds.spawn(assets.read(SceneAsset)->blueprint);
                 }
             }
@@ -73,10 +77,8 @@ int main(int argc, char** argv)
                 {
                     cmds.destroy(ent);
                 }
-
+                
                 cmds.spawn(assets.read(SceneAsset)->blueprint);
-
-                Obstacle::resetSpeed();
             }
         });
 
@@ -91,11 +93,57 @@ int main(int argc, char** argv)
                 CUBOS_INFO("Player health = {}", p.health);
                 (void)p; // here to shut up 'unused variable warning', you can remove it
             }
-            
 
         });
 
+
+    cubos.system("jetpack powerup")
+        .call([] (Query<Player&, const CollidingWith&, const Jetpack&> colision, Query<Player&, Position&> players) {
+            for (auto [player, collidingWith, jetpack] : colision) {
+
+                for (auto [p, position] : players) {
+                    position.vec.y = position.vec.y + 5;
+                    p.jetPackTimer = 5.0F;
+                    CUBOS_INFO("Time started: ",  p.jetPackTimer );
+                    p.jetPackEffect = true;
+            }
+            (void)collidingWith;
+
+        }
+             
+            
+    });
+
+    cubos.system("increase gameSpeed") 
+        .call([] (Query<Obstacle&> obstacles, GameTime& time) 
+        {
+            for (auto [obstacle]:  obstacles){
+                float velocityIncrease = glm::clamp( time.timePassed / 15, 1.0f,3.0f);
+                obstacle.speedIncrease =  velocityIncrease;
+            }
+        });
+
+
+    cubos.system("update jetpack")
+        .call([] (Query<Player&, Position&> players, DeltaTime& time)
+        {
+            for (auto  [player, position]: players){
+                if(player.jetPackEffect) {
+
+                    player.jetPackTimer -= time.value();
+                    CUBOS_INFO("Decreasing jetpack timer: ",  player.jetPackTimer );
+                }
+                if(player.jetPackEffect && player.jetPackTimer < 0) {
+                    CUBOS_INFO("Reseting jetpack");
+                    player.jetPackTimer = 0;
+                    player.jetPackEffect = false;
+                    position.vec.y -= 5;
+                }
+            }
+        });
+
     cubos.run();
+
 
    
 

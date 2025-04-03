@@ -8,6 +8,7 @@
 #include <cubos/engine/assets/plugin.hpp>
 #include <cubos/engine/transform/plugin.hpp>
 
+#include "gameTime.hpp"
 using namespace cubos::engine;
 
 CUBOS_REFLECT_IMPL(Obstacle)
@@ -15,9 +16,8 @@ CUBOS_REFLECT_IMPL(Obstacle)
     return cubos::core::ecs::TypeBuilder<Obstacle>("Obstacle")
         .withField("velocity", &Obstacle::velocity)
         .withField("killZ", &Obstacle::killZ)
+        .withField("speedIncrease", &Obstacle::speedIncrease)
         .build();
-
-    
 }
 
 void obstaclePlugin(Cubos& cubos)
@@ -31,6 +31,7 @@ void obstaclePlugin(Cubos& cubos)
         .call([](Commands cmds, const DeltaTime& dt, Query<Entity, const Obstacle&, Position&> obstacles) {
             for (auto [ent, obstacle, position] : obstacles)
             {
+            
                 position.vec += obstacle.velocity * dt.value() * obstacle.speedIncrease;
                 position.vec.y = glm::abs(glm::sin(position.vec.z * 0.15F)) * 1.5F;
 
@@ -42,6 +43,7 @@ void obstaclePlugin(Cubos& cubos)
         });
 }
 
-float Obstacle::speedIncrease = 1.0f;  // Initial value of speedIncrease
+
+
 
 
