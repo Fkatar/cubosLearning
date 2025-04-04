@@ -72,6 +72,7 @@
             "Spawner": {
                 "ObstacleScene": "6f8d2483-5afd-4913-9bb4-575649a36539",
                 "JetpackScene" : "e1a1e057-cbd1-4937-936d-bc296e133dab",
+                "ArmorScene" : "f3b9c6d2-7e8a-4b15-a3f6-92d4b789e123",
                 "sceneRoot": "base",
                 "period": 1.0,
                 "laneWidth": 9

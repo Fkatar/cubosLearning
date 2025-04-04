@@ -10,6 +10,7 @@ struct Spawner
 
     cubos::engine::Asset<cubos::engine::Scene> ObstacleScene;
     cubos::engine::Asset<cubos::engine::Scene> JetpackScene;  // Scene which will be spawned
+    cubos::engine::Asset<cubos::engine::Scene> ArmorScene; 
     std::string sceneRoot;                                    // Root entity of the scene
     float period{1.0F};                                       // Time between spawns in seconds
     float laneWidth{1.0F};                                    // Width of the lane

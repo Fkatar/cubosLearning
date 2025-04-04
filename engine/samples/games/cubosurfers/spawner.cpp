@@ -9,6 +9,7 @@
 
 #include "obstacle.hpp"
 #include "jetpack.hpp"
+#include "armor.hpp"
 
 
 using namespace cubos::engine;
@@ -18,6 +19,7 @@ CUBOS_REFLECT_IMPL(Spawner)
     return cubos::core::ecs::TypeBuilder<Spawner>("Spawner")
         .withField("ObstacleScene", &Spawner::ObstacleScene)
         .withField("JetpackScene", &Spawner::JetpackScene)
+        .withField("ArmorScene", &Spawner::ArmorScene)
         .withField("sceneRoot", &Spawner::sceneRoot)
         .withField("period", &Spawner::period)
         .withField("laneWidth", &Spawner::laneWidth)
@@ -44,9 +46,11 @@ void spawnerPlugin(Cubos& cubos)
                     int offset = (rand() % 3) - 1;
                     spawnPosition.vec.x += static_cast<float>(offset) * spawner.laneWidth;
 
-                    int randomScene = rand() % 5;
+                    int randomScene = rand() % 7;
                     if (randomScene == 0)
                         commands.spawn(assets.read(spawner.JetpackScene)->blueprint).add(spawner.sceneRoot, spawnPosition);
+                    if (randomScene == 1)
+                        commands.spawn(assets.read(spawner.ArmorScene)->blueprint).add(spawner.sceneRoot, spawnPosition);
                     else
                         commands.spawn(assets.read(spawner.ObstacleScene)->blueprint).add(spawner.sceneRoot, spawnPosition);
                 }

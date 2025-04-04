@@ -17,6 +17,7 @@
 #include "player.hpp"
 #include "spawner.hpp"
 #include "gameTime.hpp"
+#include "armor.hpp"
 
 #include <unistd.h>
 
@@ -38,6 +39,7 @@ int main(int argc, char** argv)
     cubos.plugin(spawnerPlugin);
     cubos.plugin(playerPlugin);
     cubos.plugin(timePlugin);
+    cubos.plugin(armorPlugin);
 
     cubos.startupSystem("configure settings").before(settingsTag).call([](Settings& settings) {
         settings.setString("assets.app.osPath", APP_ASSETS_PATH);
@@ -57,15 +59,16 @@ int main(int argc, char** argv)
         });
 
     cubos.system("restart the game on input")
-        .call([](Commands cmds, const Assets& assets, const Input& input, Query<Entity> all, Query<Player&> entity) {
+        .call([](Commands cmds, const Assets& assets, const Input& input, Query<Entity> all, Query<Player&> entity, GameTime& time) {
             
             for (auto [player] : entity) {
-                if (player.health < 0) {
+                if (player.health <= 0) {
                     CUBOS_INFO("Player health is below 0, restarting", player.health);
                     for (auto [ent] : all)
                     {
                         cmds.destroy(ent);
                     }
+                    time.timePassed = 0.0F;
                     cmds.spawn(assets.read(SceneAsset)->blueprint);
                 }
             }
@@ -77,21 +80,21 @@ int main(int argc, char** argv)
                 {
                     cmds.destroy(ent);
                 }
-                
+                time.timePassed = 0.0F;
                 cmds.spawn(assets.read(SceneAsset)->blueprint);
             }
         });
 
     cubos.system("detect player vs obstacle collisions")
-        .call([](Query<Player&, const CollidingWith&, const Obstacle&> collisions) {
+        .call([](Query<Player&, const CollidingWith&, Obstacle&> collisions) {
             for (auto [p, collidingWith, obstacle] : collisions)
             {
-                CUBOS_INFO("Player collided with an obstacle!");
-                // i want t odestroy the obstacle and decrease the player health, this is detroying thea player instead
-                //redo this
-                p.health--;
-                CUBOS_INFO("Player health = {}", p.health);
-                (void)p; // here to shut up 'unused variable warning', you can remove it
+                obstacle.killZ = 1000;
+                if (p.armored) 
+                    p.armored = false;
+                else 
+                    p.health--;
+               
             }
 
         });
@@ -118,8 +121,8 @@ int main(int argc, char** argv)
         .call([] (Query<Obstacle&> obstacles, GameTime& time) 
         {
             for (auto [obstacle]:  obstacles){
-                float velocityIncrease = glm::clamp( time.timePassed / 15, 1.0f,3.0f);
-                obstacle.speedIncrease =  velocityIncrease;
+                float velocityIncrease = glm::clamp( time.timePassed / 20, 0.0f,2.0f);
+                obstacle.speedIncrease =  1 + velocityIncrease;
             }
         });
 
@@ -141,6 +144,15 @@ int main(int argc, char** argv)
                 }
             }
         });
+
+    cubos.system("armor powerup")
+        .call([] (Query<Player& , const CollidingWith&, const Armor&> colison) {
+            for (auto [player, collidingWith, armor]: colison) {
+                player.armored = true;
+                (void)collidingWith;
+                (void)armor;
+            }
+    });
 
     cubos.run();
 

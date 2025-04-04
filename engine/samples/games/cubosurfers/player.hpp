@@ -7,7 +7,8 @@ struct Player
     CUBOS_REFLECT;
 
     float jetPackTimer{0.0F};
-    bool jetPackEffect{false};  // time remaining for the player in the air
+    bool jetPackEffect{false}; // time remaining for the player in the air
+    bool armored{false};       // is player armored ? 
     float speed{1.0F};         // Speed of the player
     float laneWidth{1.0F};     // Width of the lane
     int lane{0};               // Current lane
